@@ -1,0 +1,8 @@
+package cn.syt.game2048_2;
+
+public class MyGame {
+
+	public static void main(String[] args) {
+		new Game();
+	}
+}
