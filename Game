@@ -1,0 +1,299 @@
+package cn.syt.game2048_2;
+
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.util.Random;
+
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.border.EtchedBorder;
+
+public class Game extends JFrame{
+	public int Score;
+	public JLabel jLabel = new JLabel();
+	private card[][] cards = new card[5][5];
+	
+	final public void left() {
+		boolean Merge =false;
+		for(int x=0;x<4;x++) {
+			for(int y=0;y<4;y++) {
+				for(int k=y+1;k<4;k++) {
+					if(cards[x][k].getNum()!=0) {
+						if(cards[x][y].getNum()==0) {
+							cards[x][y].setNumber(cards[x][k].getNum());
+							cards[x][k].setNumber(0);
+							y--;
+							Merge=true;
+						}else if(cards[x][y].getNum()==cards[x][k].getNum()) {
+							cards[x][y].setNumber(cards[x][k].getNum()*2);
+							cards[x][k].setNumber(0);
+							Score+=cards[x][y].getNum();
+							jLabel.setText("Score:"+String.valueOf(Score));
+							Merge=true;
+						}
+						break;
+					}
+				}
+			}
+		}
+		if(Merge) {
+			autoCreateCard();
+		}
+	}
+	
+	final public void right() {
+		boolean Merge=false;
+		for(int x=0;x<4;x++) {
+			for(int y=3;y>=0;y--) {
+				for(int k=y-1;k>=0;k--) {
+					if(cards[x][k].getNum()!=0) {
+						if(cards[x][y].getNum()==0) {
+							cards[x][y].setNumber(cards[x][k].getNum());
+							cards[x][k].setNumber(0);
+							y++;
+							Merge=true;
+						}else if(cards[x][y].getNum()==cards[x][k].getNum()) {
+							cards[x][y].setNumber(cards[x][k].getNum()*2);
+							cards[x][k].setNumber(0);
+							Score+=cards[x][y].getNum();
+							jLabel.setText("Score:"+String.valueOf(Score));
+							Merge=true;
+						}
+						break;
+					}
+				}
+			}
+		}
+		if(Merge) {
+			autoCreateCard();
+		}
+	}
+	
+	final public void up() {
+		boolean Merge=false;
+		for(int y=0;y<4;y++) {
+			for(int x=0;x<4;++x) {
+				for(int k=x+1;k<4;++k) {
+					if(cards[k][y].getNum()!=0) {
+						if(cards[x][y].getNum()==0) {
+							cards[x][y].setNumber(cards[k][y].getNum());
+							cards[k][y].setNumber(0);
+							x--;
+							Merge=true;
+						}else if(cards[x][y].getNum()==cards[k][y].getNum()){
+							cards[x][y].setNumber(cards[k][y].getNum()*2);
+							cards[k][y].setNumber(0);
+							Score+=cards[x][y].getNum();
+							jLabel.setText("Score:"+String.valueOf(Score));
+							Merge=true;
+						}
+						break;
+					}
+				}
+			}
+		}
+		if(Merge) {
+			autoCreateCard();
+		}
+	}
+	
+	final public void down() {
+		boolean Merge=false;
+		for(int y=0;y<4;y++) {
+			for(int x=3;x>=0;x--) {
+				for(int k=x-1;k>=0;--k) {
+					if(cards[k][y].getNum()!=0) {
+						if(cards[x][y].getNum()==0) {
+							cards[x][y].setNumber(cards[k][y].getNum());
+							cards[k][y].setNumber(0);
+							x++;
+							Merge=true;
+						}else if(cards[x][y].getNum()==cards[k][y].getNum()) {
+							cards[x][y].setNumber(cards[k][y].getNum()*2);
+							cards[k][y].setNumber(0);
+							Score+=cards[x][y].getNum();
+							jLabel.setText("Score:"+String.valueOf(Score));
+							Merge=true;
+						}
+						break;
+					}
+				}
+			}
+		}
+		if(Merge) {
+			autoCreateCard();
+		}
+	}
+	
+	public void autoCreateCard() {
+		Random ran =new Random();
+		int x=ran.nextInt(4);
+		int y=ran.nextInt(4);
+		if(cards[x][y].getNum()>0) {
+			autoCreateCard();
+		}else {
+			cards[x][y].setNumber(ran.nextInt(2)<1?2:4);
+		}
+	}
+	public void startGame() {
+		
+		Score=0;
+		JPanel myJPanelI = new JPanel();
+		myJPanelI.setLayout(null);
+		myJPanelI.setBackground(new Color(187, 173, 160));
+		this.setContentPane(myJPanelI);
+		jLabel.setBounds(200,5,290,40);
+		jLabel.setText("Score:"+String.valueOf(Score));
+		jLabel.setFont(new Font("HirakakuPro-W6", Font.PLAIN, 20));
+		myJPanelI.add(jLabel);
+		for(int i=0;i<4;++i) {
+			for(int j=0;j<4;++j) {
+				cards[i][j] =new card();
+				cards[i][j].setBounds(75+j*85, 40+i*85, 80, 80);
+				cards[i][j].setNumber(0);
+				myJPanelI.add(cards[i][j]);
+			}
+		}
+		autoCreateCard();
+		autoCreateCard();
+		this.setVisible(true);
+		myJPanelI.requestFocus();
+		myJPanelI.addKeyListener(new KeyAdapter() {
+			public void keyPressed(KeyEvent e) {
+				checkGameEnd();
+				if(e.getKeyChar()=='w'||e.getKeyCode()==KeyEvent.VK_UP) {
+					up();
+				}
+				if(e.getKeyChar()=='s'||e.getKeyCode()==KeyEvent.VK_DOWN) {
+					down();
+				}
+				if(e.getKeyChar()=='d'||e.getKeyCode()==KeyEvent.VK_RIGHT) {
+					right();
+				}
+				if(e.getKeyChar()=='a'||e.getKeyCode()==KeyEvent.VK_LEFT) {
+					left();
+				}
+			}
+		});
+		JButton myJButton = new JButton("重新开始");
+		myJButton.setBounds(75,400,100,30);
+		myJPanelI.add(myJButton);
+		myJButton.addActionListener(new ActionListener() {		
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				startGame();
+			}
+		});
+		JButton myJButtonl =new JButton("返回主界面");
+		myJButtonl.setBounds(310,400,100,30);
+		myJPanelI.add(myJButtonl);
+		myJButtonl.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				creatNewGame();
+			}
+		});
+	}
+	
+	public void creatNewGame() {
+		JPanel myJPanelI =new JPanel();
+		myJPanelI.setLayout(null);
+		this.setContentPane(myJPanelI);
+		JLabel myJLabel =new JLabel();
+		myJLabel.setBounds(50,50,400,200);
+		myJLabel.setBorder(new EtchedBorder(EtchedBorder.LOWERED,Color.CYAN,null));
+		myJPanelI.add(myJLabel);
+		myJLabel.setFont(new Font("HirakakuProN-W6",Font.PLAIN,16));
+		String string="<html><body><h2 align=center>2048游戏说明</h2></body></html>";
+		myJLabel.setText(string);
+		JButton myJButton =new JButton("开始游戏");
+		myJButton.setBounds(60,300,100,30);
+		myJPanelI.add(myJButton);
+		myJButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				startGame();
+			}
+		});
+		JButton myJButtonI= new JButton("退出游戏");
+		myJButton.setBounds(310, 300, 100, 30);
+		myJPanelI.add(myJButtonI);
+		myJButtonI.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				System.exit(0);
+			}
+		});
+		this.setVisible(true);
+	}
+	
+	public Game() {
+		this.setTitle("2048游戏");
+		this.setBounds(300,150,500,480);
+		JPanel myJPanel =new JPanel();
+		myJPanel.setLayout(null);
+		this.setContentPane(myJPanel);
+		JLabel myJLabel =new JLabel("欢迎玩2048");
+		myJLabel.setBounds(120,100,300,50);
+		myJLabel.setFont(new Font("HirakakuProN-W6",Font.BOLD,30));
+		myJLabel.setForeground(Color.BLUE);
+		myJPanel.add(myJLabel);
+		JButton myJButton = new JButton("进入游戏");
+		myJButton.setBounds(50,300,100,30);
+		myJPanel.add(myJButton);
+		myJButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				creatNewGame();
+			}
+		});
+		JButton myJButtonI =new JButton("退出游戏");
+		myJButton.setBounds(300, 300, 100, 30);
+		myJPanel.add(myJButtonI);
+		myJButtonI.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				System.exit(0);
+			}
+		});
+		this.setVisible(true);
+	}
+	
+	public void checkGameEnd() {
+		boolean isGameOver = true;
+		for(int x=0;x<4;++x) {
+			for(int y=0;y<4;++y) {
+				if(cards[x][y].getNum()==0||
+						(x>0&&cards[x][y].getNum()==cards[x-1][y].getNum())||
+						(x<3&&cards[x][y].getNum()==cards[x+1][y].getNum())||
+						(y>0&&cards[x][y].getNum()==cards[x][y-1].getNum())||
+						(y<3&&cards[x][y].getNum()==cards[x][y+1].getNum())) {
+					isGameOver=false;
+				}
+			}
+		}
+		if(isGameOver)gameEnd();
+	}
+	public void gameEnd() {
+		String[] options= {"重新开始","退出游戏"};
+		int response = JOptionPane.showOptionDialog(null, "游戏结束是否继续", "游戏结束", JOptionPane.OK_OPTION,JOptionPane.OK_OPTION,null,options,null);
+		if(response==0) {
+			creatNewGame();
+		}else {
+			System.exit(0);
+		}
+	}
+}
